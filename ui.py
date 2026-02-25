@@ -4,11 +4,12 @@ from file_handler import FileHandler
 from printer import PrinterManager
 import threading
 import os
-
+from settings_manager import SettingsManager
 
 class PrintizaardUI:
     def __init__(self, root):
         self.root = root
+        self.settings = SettingsManager()
         self.root.title("Printizaard")
         self.root.geometry("520x340")
 
@@ -59,6 +60,7 @@ class PrintizaardUI:
         self.status_label.pack()
         self.set_button_state(True)
 
+
     def load_printers(self):
         display_list = []
 
@@ -68,13 +70,25 @@ class PrintizaardUI:
             self.printer_map[display] = p["name"]
 
         self.printer_dropdown["values"] = display_list
-
+        last_used = self.settings.get_last_printer()
         default = self.printer_manager.get_default_printer()
 
+        # Try last used for this PC
+        if last_used:
+            for key, value in self.printer_map.items():
+                if value == last_used:
+                    self.selected_printer.set(key)
+                    return
+
+        # Fallback to system default
         for key, value in self.printer_map.items():
             if value == default:
                 self.selected_printer.set(key)
-                break
+                return
+
+        # Final fallback → first printer in list
+        if self.printer_dropdown["values"]:
+            self.selected_printer.set(self.printer_dropdown["values"][0])
 
     def update_display(self):
         info = self.file_handler.get_print_info()
@@ -134,6 +148,9 @@ class PrintizaardUI:
         self.update_display()
         self.status_label.config(text="✅ Done")
         self.set_button_state(True)
+        selected_display = self.selected_printer.get()
+        printer = self.printer_map.get(selected_display)
+        self.settings.set_last_printer(printer)
 
     def print_error(self, message):
         self.status_label.config(text=f"❌ {message}")

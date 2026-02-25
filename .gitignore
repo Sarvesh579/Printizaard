@@ -40,6 +40,10 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 
+Printizaard_temp/
+**.pdf
+**.docx
+
 # Translations
 *.mo
 *.pot
