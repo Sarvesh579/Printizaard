@@ -3,6 +3,7 @@ from tkinter import ttk
 from file_handler import FileHandler
 from printer import PrinterManager
 import threading
+import time
 import os
 from settings_manager import SettingsManager
 
@@ -101,7 +102,11 @@ class PrintizaardUI:
 
         self.file_label.config(text=info["file"])
         self.total_pages_label.config(text=f"Total pages: {info['total']}")
-        self.mode_label.config(text=f"{info['mode']} → Print {info['count']} pages")
+        self.mode_label.config(text = (
+            "Print 1 page"
+            if info["mode"] == "SINGLE"
+            else f"{info['mode']} → Print {info['count']} pages"
+        ))
 
     def is_virtual_printer(self, printer_name):
         blocked = ["PDF", "OneNote", "XPS"]
@@ -138,6 +143,7 @@ class PrintizaardUI:
     def print_job(self, file_path, printer):
         try:
             self.printer_manager.print_pdf(file_path, printer)
+            time.sleep(3)
             self.root.after(0, self.print_success)
 
         except Exception as e:

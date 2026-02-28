@@ -50,7 +50,6 @@ class FileHandler:
     def convert_word_to_pdf(self, word, word_file):
 
         try:
-
             doc = word.Documents.Open(os.path.join(self.folder, word_file))
 
             pdf_name = os.path.splitext(word_file)[0] + ".pdf"
@@ -72,7 +71,13 @@ class FileHandler:
 
         file = self.files[self.index]
         total = len(PdfReader(os.path.join(self.folder, file)).pages)
-
+        if total == 1:
+            return {
+                "file": file,
+                "total": total,
+                "mode": "SINGLE",
+                "count": 1
+            }
         if self.mode == "ODD":
             pages = (total + 1) // 2
         else:
@@ -86,6 +91,15 @@ class FileHandler:
         }
 
     def next_step(self):
+
+        file = self.files[self.index]
+        total = len(PdfReader(os.path.join(self.folder, file)).pages)
+
+        # ⭐ SINGLE PAGE → skip even logic
+        if total == 1:
+            self.index += 1
+            self.mode = "ODD"
+            return
 
         if self.mode == "ODD":
             self.mode = "EVEN"

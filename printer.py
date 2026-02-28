@@ -1,5 +1,5 @@
 import win32print
-import subprocess
+import win32api
 import shutil
 
 class PrinterManager:
@@ -56,22 +56,13 @@ class PrinterManager:
             raise Exception("Microsoft Edge not found")
 
         try:
-            result = subprocess.run(
-                [
-                    self.edge_path,
-                    "--headless",
-                    "--disable-gpu",
-                    f'--print-to-printer={printer_name}',
-                    file_path
-                ],
-                capture_output=True,
-                text=True,
-                timeout=10   # ⬅️ KEY FIX
+            win32api.ShellExecute(
+                0,
+                "printto",
+                file_path,
+                f'"{printer_name}"',
+                ".",
+                0
             )
-
-            if result.returncode != 0:
-                error = result.stderr.strip() or "Printing failed"
-                raise Exception(error)
-
-        except subprocess.TimeoutExpired:
-            raise Exception("Printer not responding / not connected")
+        except Exception as e:
+            raise Exception(str(e))
