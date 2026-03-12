@@ -78,14 +78,18 @@ python main.py
 ---
 
 ## 📦 Build the EXE Yourself
-
+Bash
 ```bash
-pyinstaller --noconfirm --onefile --windowed --name Printizaard \
---hidden-import=win32com \
---hidden-import=win32com.client \
---hidden-import=pythoncom \
---hidden-import=pywintypes \
-main.py
+`  pyinstaller --noconfirm --onefile --windowed --name Printizaard \
+  --hidden-import=win32com \
+  --hidden-import=win32com.client \
+  --hidden-import=pythoncom \
+  --hidden-import=pywintypes \
+  main.py`
+```
+or Powershell
+```powershell
+pyinstaller --noconfirm --onefile --windowed --name Printizaard --hidden-import=win32com --hidden-import=win32com.client --hidden-import=pythoncom --hidden-import=pywintypes main.py
 ```
 
 Output:
