@@ -4,9 +4,7 @@ import win32com.client
 
 
 class FileHandler:
-
     def __init__(self):
-
         self.folder = os.getcwd()
         self.temp_folder = os.path.join(self.folder, "Printizaard_temp")
 
@@ -14,30 +12,21 @@ class FileHandler:
             os.makedirs(self.temp_folder)
 
         self.files = self.prepare_files()
-
         self.index = 0
         self.mode = "ODD"
 
     def prepare_files(self):
-
         files = []
-
         word = None
-
         for f in os.listdir(self.folder):
-
             if f.lower().endswith(".pdf"):
                 files.append(f)
 
             elif f.lower().endswith((".doc", ".docx")):
-
-                # open Word only once (faster & safer)
                 if word is None:
                     word = win32com.client.Dispatch("Word.Application")
                     word.Visible = False
-
                 pdf_name = self.convert_word_to_pdf(word, f)
-
                 if pdf_name:
                     files.append(pdf_name)
 
@@ -48,10 +37,8 @@ class FileHandler:
         return files
 
     def convert_word_to_pdf(self, word, word_file):
-
         try:
             doc = word.Documents.Open(os.path.join(self.folder, word_file))
-
             pdf_name = os.path.splitext(word_file)[0] + ".pdf"
             pdf_path = os.path.join(self.temp_folder, pdf_name)
 
@@ -65,7 +52,6 @@ class FileHandler:
             return None
 
     def get_print_info(self):
-
         if self.index >= len(self.files):
             return None
 
@@ -85,17 +71,14 @@ class FileHandler:
 
         return {
             "file": file,
-            "total": total,
+            "total": total, 
             "mode": self.mode,
             "count": pages
         }
 
     def next_step(self):
-
         file = self.files[self.index]
         total = len(PdfReader(os.path.join(self.folder, file)).pages)
-
-        # ⭐ SINGLE PAGE → skip even logic
         if total == 1:
             self.index += 1
             self.mode = "ODD"

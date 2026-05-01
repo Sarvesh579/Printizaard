@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 from file_handler import FileHandler
 from printer import PrinterManager
+from logger import Logger
 import threading
 import time
 import os
@@ -16,6 +17,7 @@ class PrintizaardUI:
 
         self.file_handler = FileHandler()
         self.printer_manager = PrinterManager()
+        self.logger = Logger()
 
         self.printer_map = {}
         self.selected_printer = tk.StringVar()
@@ -63,12 +65,12 @@ class PrintizaardUI:
 
 
     def load_printers(self):
-        display_list = []
-
+        display_list = []            
         for p in self.printer_manager.printers:
             display = f"{p['name']} → {p['status']}"
             display_list.append(display)
             self.printer_map[display] = p["name"]
+            self.logger.write(f"Detected printer: {p['name']} | Status: {p['status']}")
 
         self.printer_dropdown["values"] = display_list
         last_used = self.settings.get_last_printer()
@@ -113,26 +115,26 @@ class PrintizaardUI:
         return any(word in printer_name for word in blocked)
 
     def next_action(self, event=None):
-
+        self.logger.write("User pressed PRINT / NEXT")
         info = self.file_handler.get_print_info()
         if not info:
             return
 
         selected_display = self.selected_printer.get()
         printer = self.printer_map.get(selected_display)
-
         if not printer:
             self.status_label.config(text="❌ No printer selected")
             return
+        self.logger.write(f"Selected printer: {printer}")
 
         if self.is_virtual_printer(printer):
             self.status_label.config(text="❌ Cannot print to virtual printer")
             return
 
         file_path = os.path.join(os.getcwd(), info["file"])
-
         self.set_button_state(False)
         self.status_label.config(text="🖨 Printing...")
+        self.logger.write(f"Printing file: {info['file']} | Mode: {info['mode']}")
 
         threading.Thread(
             target=self.print_job,
@@ -142,10 +144,10 @@ class PrintizaardUI:
 
     def print_job(self, file_path, printer):
         try:
-            self.printer_manager.print_pdf(file_path, printer)
+            self.printer_manager.print_pdf(file_path, printer, self.logger)
             time.sleep(3)
             self.root.after(0, self.print_success)
-
+            self.logger.write("Print successful, moving to next step")
         except Exception as e:
             self.root.after(0, self.print_error, str(e))
 
@@ -160,6 +162,7 @@ class PrintizaardUI:
 
     def print_error(self, message):
         self.status_label.config(text=f"❌ {message}")
+        self.logger.write(f"ERROR: {message}")
         self.set_button_state(True)
 
     def set_button_state(self, enabled):

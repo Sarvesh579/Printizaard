@@ -51,10 +51,11 @@ class PrinterManager:
     def get_default_printer(self):
         return self.default_printer
 
-    def print_pdf(self, file_path, printer_name):
+    def print_pdf(self, file_path, printer_name, logger=None):
         if not self.edge_path:
             raise Exception("Microsoft Edge not found")
-
+        if logger:
+            logger.write(f"Sending print job → {file_path} → {printer_name}")
         try:
             win32api.ShellExecute(
                 0,
