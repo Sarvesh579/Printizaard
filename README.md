@@ -95,7 +95,6 @@ pyinstaller --noconfirm --onefile --windowed --name Printizaard --hidden-import=
 Output:
 
 ```
-
 dist/Printizaard.exe
 
 ```
@@ -157,25 +156,7 @@ MIT License
 
 Made with ☕ to eliminate the pain of manual bulk printing.
 
-````
-
----
-
-# ✅ Replace this line before committing
 
 ```md
-git clone https://github.com/<your-username>/Printizaard.git
+git clone https://github.com/Sarvesh579/Printizaard.git
 ````
-
-with your actual repo URL.
-
----
-
-# ⭐ Optional additions (tell me if you want)
-
-We can add:
-
-* screenshots section
-* demo GIF
-* version badge
-* “How odd/even logic works” diagram
